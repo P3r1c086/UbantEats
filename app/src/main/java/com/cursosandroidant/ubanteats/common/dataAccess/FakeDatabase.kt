@@ -1,5 +1,6 @@
 package com.cursosandroidant.ubanteats.common.dataAccess
 
+import com.cursosandroidant.ubanteats.common.entities.DeliveryUser
 import com.cursosandroidant.ubanteats.common.entities.Product
 
 /****
@@ -16,6 +17,13 @@ import com.cursosandroidant.ubanteats.common.entities.Product
  * Web: www.alainnicolastello.com
  ***/
 object FakeDatabase {
+
+    fun getDeliveryUser(): DeliveryUser {
+
+        return DeliveryUser("Joy", "https://upload.wikimedia.org/wikipedia/commons/thumb" +
+                "/8/89/Joy_Red_Velvet_in_2019.jpg/190px-Joy_Red_Velvet_in_2019.jpg")
+    }
+
     fun getProducts(): List<Product>{
         val products: MutableList<Product> = ArrayList()
         

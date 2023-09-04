@@ -19,10 +19,12 @@
     <string name="products_btn_add_cart">Añadir</string>
 
     <string name="tracking_title">Seguimiento de tu pedido…</string>
-
+<!--Permisos-->
     <string name="location_permission_denied">Permiso denegado. Por favor intente de nuevo y otorgue el permiso de ubicación.\nSi el permiso ha sido denegado permanentemente, este puede habilitarse en Configuración &gt; Aplicaciones &gt; Maps Basics.</string>
     <string name="permission_required_toast">El permiso de ubicación es requerido.</string>
     <string name="permission_rationale_location">Se requiere acceder al servicio de ubicación</string>
+
     <string name="tracking_btn_finish">Finalizar</string>
     <string name="tracking_description_photo">Foto del repartidor</string>
+    <string name="traking_name">%s está en camino…</string>
 </resources>

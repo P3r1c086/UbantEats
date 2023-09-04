@@ -5,13 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.cursosandroidant.ubanteats.R
+import com.cursosandroidant.ubanteats.common.dataAccess.FakeDatabase
 import com.cursosandroidant.ubanteats.databinding.FragmentTrackingBinding
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 /****
@@ -54,6 +59,33 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
         mapFragment?.getMapAsync(this)
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupButtons()
+        setupDeliveryUserToUi()
+    }
+
+    private fun setupButtons() {
+        //simulo con una corrutina un delay para habilitar despues un boton
+        lifecycleScope.launch {
+            delay(1_000)
+            binding.btnFinish.isEnabled = true
+        }
+    }
+
+    private fun setupDeliveryUserToUi() {
+        //Consulto el usuario
+        val user = FakeDatabase.getDeliveryUser()
+        with(binding){
+            tvName.setText(getString(R.string.traking_name, user.name))
+            Glide.with(this@TrackingFragment)
+                .load(user.photoUrl)
+                .circleCrop()
+                .into(imgPhoto)
+        }
     }
 
     /**
