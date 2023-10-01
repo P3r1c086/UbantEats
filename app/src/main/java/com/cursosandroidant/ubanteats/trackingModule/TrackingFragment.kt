@@ -9,12 +9,15 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.cursosandroidant.ubanteats.R
 import com.cursosandroidant.ubanteats.common.dataAccess.FakeDatabase
+import com.cursosandroidant.ubanteats.common.utils.MapUtils
 import com.cursosandroidant.ubanteats.databinding.FragmentTrackingBinding
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
+import com.google.maps.android.SphericalUtil
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -69,11 +72,7 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
     }
 
     private fun setupButtons() {
-        //simulo con una corrutina un delay para habilitar despues un boton
-        lifecycleScope.launch {
-            delay(1_000)
-            binding.btnFinish.isEnabled = true
-        }
+
     }
 
     private fun setupDeliveryUserToUi() {
@@ -94,12 +93,26 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
     override fun onMapReady(googleMap: GoogleMap) {
         //referencia global
         map = googleMap
-        //algunas configuraciones
-        map.uiSettings.isZoomControlsEnabled = true
+
+        MapUtils.setupMap(requireActivity(), map)//como es un fragmento pongo requireActivity como contexto
+
+        //todo mover esto
+        calcRealDistance(MapUtils.getOriginDelivery())
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    private fun calcRealDistance(location: LatLng){
+        //para esto se han agreagado dos librerias propias de GoogleMaps utils
+        //El metodo computeDistanceBetween (de la libreria SphericalUtil) me pide dos posiciones Latlan.
+        // La primera es el origen(la que va a ir cambiando) y la segunda es el destino
+        val distance = SphericalUtil.computeDistanceBetween(location, MapUtils.getDestinationDelivery())
+        //seteo la distancia el el textView
+        binding.tvDistance.text = getString(R.string.tracking_distance, MapUtils.formatDistance(distance))
+        //distancia a la que creamos prudente que se pueda finalizar. De momento pongo 60 metros
+        binding.btnFinish.isEnabled = distance < 60
     }
 }

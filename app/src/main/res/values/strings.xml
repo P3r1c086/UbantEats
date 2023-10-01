@@ -27,4 +27,6 @@
     <string name="tracking_btn_finish">Finalizar</string>
     <string name="tracking_description_photo">Foto del repartidor</string>
     <string name="traking_name">%s está en camino…</string>
+    <string name="tracking_distance">A %s de llegar</string>
+<!--    %s Esto significa que se va a concatenar un String-->
 </resources>

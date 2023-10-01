@@ -44,6 +44,8 @@ def nav_version = "2.7.1"
 def maps_version = "18.1.0"
 def lifecycle_version = "2.6.1"
 def coroutines_version = '1.7.1'
+def maps_utils_version = "2.3.0"
+def maps_utils_ktx_version = "3.4.0"
 
 dependencies {
 
@@ -67,6 +69,10 @@ dependencies {
 
     //LifeCycleScope
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
+    //Maps Utils
+    implementation "com.google.maps.android:android-maps-utils:$maps_utils_version"
+    implementation "com.google.maps.android:maps-utils-ktx:$maps_utils_ktx_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
