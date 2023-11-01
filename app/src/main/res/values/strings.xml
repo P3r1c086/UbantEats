@@ -28,5 +28,8 @@
     <string name="tracking_description_photo">Foto del repartidor</string>
     <string name="traking_name">%s está en camino…</string>
     <string name="tracking_distance">A %s de llegar</string>
-<!--    %s Esto significa que se va a concatenar un String-->
+    <string name="tracking_total_product">Una</string>
+    <string name="tracking_label_product">rosquilla</string>
+    <string name="tracking_label_products">rosquillas</string>
+    <!--    %s Esto significa que se va a concatenar un String-->
 </resources>

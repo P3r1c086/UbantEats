@@ -19,6 +19,7 @@ object MapUtils {
     //Se requiere el la variable para el marcador del repartidor porque se va a estar moviendo,
     // mientras que el destino es fijo
     private var deliveryMarker: Marker? = null
+    private var totalProducts: Int = 0
 
     //Calle Sol
     fun getDestinationDelivery(): LatLng = LatLng(37.176313982382894, -3.6093397191763383)
@@ -37,7 +38,7 @@ object MapUtils {
         }
         setupMapStyle(context, map)
 
-        addDeliveryMarker(map, getOriginDelivery())
+        addDeliveryMarker(context, map, getOriginDelivery())
         addDestinationMarker(map, getDestinationDelivery())
     }
 
@@ -47,14 +48,9 @@ object MapUtils {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        //todo: remove this
-        //con esto configuramos los iconos
-        setupMarkersData(context)
-
-
     }
 
-    private fun setupMarkersData(context: Context){
+    fun setupMarkersData(context: Context, total: Int){
         //configuramos los iconos de repartidor y destino
         Utils.getBitmapFromVector(context, R.drawable.ic_delivery_motorbike_32)?.let {
             iconDeliveryMarker = it
@@ -62,9 +58,10 @@ object MapUtils {
         Utils.getBitmapFromVector(context, R.drawable.ic_destination_flag_32)?.let {
             iconDestinationMarker = it
         }
+        totalProducts = total
     }
 
-    private fun addDeliveryMarker(map: GoogleMap, location: LatLng){
+    private fun addDeliveryMarker(context: Context, map: GoogleMap, location: LatLng){
         iconDeliveryMarker?.let {
             deliveryMarker = map.addMarker(MarkerOptions()
                 //Nuestro repartidor se va a ir moviendo en el tiempo y la distancia, por lo que la
@@ -72,10 +69,25 @@ object MapUtils {
                 .position(location)
                 .icon(BitmapDescriptorFactory.fromBitmap(it))
                 .anchor(0.5f, 0.5f)
-                .title("12 rosquillas")
+                .title(formatTitle(context))
             )
+            deliveryMarker?.showInfoWindow()
         }
     }
+
+    private fun formatTitle(context: Context): String {
+        var total = ""
+        var label = ""
+        if (totalProducts == 1){
+            total = context.getString(R.string.tracking_total_product)
+            label = context.getString(R.string.tracking_label_product)
+        }else{
+            total = totalProducts.toString()
+            label = context.getString(R.string.tracking_label_products)
+        }
+        return String.format("%s %s", total, label)
+    }
+
     private fun addDestinationMarker(map: GoogleMap, location: LatLng){
         //Una vez configurados los iconos(pasandolos de imagen de vectores a bitmap), los agregamos
         // al marcador

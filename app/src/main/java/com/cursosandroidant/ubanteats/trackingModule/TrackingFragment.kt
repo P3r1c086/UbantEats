@@ -1,16 +1,23 @@
 package com.cursosandroidant.ubanteats.trackingModule
 
+import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.cursosandroidant.ubanteats.R
 import com.cursosandroidant.ubanteats.common.dataAccess.FakeDatabase
 import com.cursosandroidant.ubanteats.common.utils.MapUtils
 import com.cursosandroidant.ubanteats.databinding.FragmentTrackingBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -41,6 +48,23 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
     private val binding get() = _binding!!
 
     private lateinit var map: GoogleMap
+
+    //En esta variable vamos a guardar todas las posiciones del repartidor para luego hacer la ruta
+    // con las polilineas
+    private var locations = mutableListOf<LatLng>()
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private var locationCallback = object : LocationCallback(){
+        override fun onLocationResult(result: LocationResult) {
+            super.onLocationResult(result)
+            result.locations.run {
+                this.forEach { locations.add(LatLng(it.latitude, it.longitude)) }
+                //Aqui comenzamos a dibujar la polilinea
+                Log.i("fused location provider", "onLocationsResult: $locations")
+            }
+        }
+    }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,10 +93,15 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
 
         setupButtons()
         setupDeliveryUserToUi()
+
+        MapUtils.setupMarkersData(requireActivity(),
+            TrackingFragmentArgs.fromBundle(requireArguments()).totalProducts)
     }
 
     private fun setupButtons() {
-
+        binding.btnFinish.setOnClickListener {
+            NavHostFragment.findNavController(this).navigate(R.id.action_trackingFragment_to_productsFragment)
+        }
     }
 
     private fun setupDeliveryUserToUi() {
@@ -90,9 +119,12 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
     /**
      * Metodo para que, una vez inicializado el mapa y bien configurado, podamos hacer uso de el
      */
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         //referencia global
         map = googleMap
+        //todo remove this
+        map.isMyLocationEnabled = true
 
         MapUtils.setupMap(requireActivity(), map)//como es un fragmento pongo requireActivity como contexto
 
