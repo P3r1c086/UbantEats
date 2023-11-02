@@ -3,6 +3,7 @@ package com.cursosandroidant.ubanteats.trackingModule
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,10 @@ import com.cursosandroidant.ubanteats.common.utils.MapUtils
 import com.cursosandroidant.ubanteats.databinding.FragmentTrackingBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -61,7 +65,13 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
             result.locations.run {
                 this.forEach { locations.add(LatLng(it.latitude, it.longitude)) }
                 //Aqui comenzamos a dibujar la polilinea
-                Log.i("fused location provider", "onLocationsResult: $locations")
+                MapUtils.addPolyline(map, locations)
+                if (locations.isNotEmpty()){
+                    //calculamos la distancia en tiempo real
+                    calcRealDistance(locations.last())
+                    //Este metodo recibe una unica location y la que nos interesa es la ultima
+                    MapUtils.runDeliveryMap(requireActivity(), map, locations.last())
+                }
             }
         }
     }
@@ -85,6 +95,10 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
         // notifique posteriormente con onMapReady()
         mapFragment?.getMapAsync(this)
 
+        //Con esto inicializamos el servicio
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+
         return binding.root
     }
 
@@ -98,9 +112,21 @@ class TrackingFragment : Fragment(), OnMapReadyCallback{
             TrackingFragmentArgs.fromBundle(requireArguments()).totalProducts)
     }
 
+    @SuppressLint("MissingPermission")
     private fun setupButtons() {
         binding.btnFinish.setOnClickListener {
+            //removemos el callback
+            fusedLocationClient.removeLocationUpdates(locationCallback)
             NavHostFragment.findNavController(this).navigate(R.id.action_trackingFragment_to_productsFragment)
+        }
+        binding.btnGo.setOnClickListener {
+            map.clear()//limpiamos el mapa
+            MapUtils.addDestinationMarker(map, MapUtils.getDestinationDelivery())
+            //Le agergamos su callback
+            fusedLocationClient.requestLocationUpdates(
+                MapUtils.locationRequest,
+                locationCallback,
+                Looper.getMainLooper())
         }
     }
 
