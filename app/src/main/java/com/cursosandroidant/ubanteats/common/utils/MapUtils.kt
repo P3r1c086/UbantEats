@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import com.cursosandroidant.ubanteats.R
+import com.google.android.gms.location.Granularity
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -44,6 +45,11 @@ object MapUtils {
         //En setPriority le estamos configurando que solicitamos intervalos cortos para obtener una
         // ubicacion
         .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+
+//    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5_000)
+//        .setMinUpdateIntervalMillis(2_000)
+//        .setGranularity(Granularity.GRANULARITY_FINE)
+//        .build()
 
     //Casa
     fun getDestinationDelivery(): LatLng = LatLng(37.123678269706275, -3.6710739733400524)
